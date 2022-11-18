@@ -214,9 +214,9 @@ void ReadDataFile::Read(const char * filename, const char * nEvent )
 	cout << "------------------------------------------------------------------" << endl;
 	if(max_nEvents_to_process <=0){// Read all the events
 		while (true) {
+			cout<<"\r| File : "<<filename2<<" | Read: "<<int(double(fPtInFile)/double(fileSize) * 100) << "% of "<<fileSize_kbytes<<" KB" <<std::flush;
 			framesize = fFrame->ReadInFile(&fLun, pvector, &vectorsize);
 			fPtInFile+=framesize;
-			cout<<"\r| File : "<<filename2<<" | Read: "<<int(double(fPtInFile)/double(fileSize) * 100) << "% of "<<fileSize_kbytes<<" KB" <<std::flush;
 			if (framesize <= 0) break;
 			if(frameCounter[7] > 1) break;
 			ReadUserFrame(fFrame);
