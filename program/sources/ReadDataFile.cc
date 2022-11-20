@@ -11,7 +11,7 @@
 
 //---------------ooooooooooooooo---------------ooooooooooooooo---------------ooooooooooooooo---------------
 /*!
- * To the size of the file in kilo bytes
+ * To the size of the file in bytes
  */
 long get_file_size(const char * filename){
 	FILE *fd = fopen(filename, "r");
