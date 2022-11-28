@@ -257,6 +257,7 @@ void ReadDataFile::ReadUserFrame(MFMCommonFrame* commonframe) {
 		case MFM_COBO_FRAME_TYPE: 
 			frameCounter[0]++;
 			ReadCoboFrame(commonframe);
+			if(oTree)oTree->Fill();
 			break;
 		case MFM_EBY_EN_FRAME_TYPE:
 		case MFM_EBY_TS_FRAME_TYPE:
@@ -275,10 +276,12 @@ void ReadDataFile::ReadUserFrame(MFMCommonFrame* commonframe) {
 		case MFM_REA_GENE_FRAME_TYPE: 
 			frameCounter[5]++;
 			ReadGenericFrame(commonframe);
+			if(oTree)oTree->Fill();
 			break;
 		case MFM_SIRIUS_FRAME_TYPE: 
 			frameCounter[6]++;
 			ReadSiriusFrame(commonframe);
+			if(oTree)oTree->Fill();
 			break;
 		case MFM_MERGE_EN_FRAME_TYPE:
 		case MFM_MERGE_TS_FRAME_TYPE:
@@ -290,7 +293,7 @@ void ReadDataFile::ReadUserFrame(MFMCommonFrame* commonframe) {
                         ReadDefaultFrame(commonframe);
 			break;
 	}// end of switch
-	if(oTree)oTree->Fill();
+	
 }
 //---------------ooooooooooooooo---------------ooooooooooooooo---------------ooooooooooooooo---------------
 /*!
