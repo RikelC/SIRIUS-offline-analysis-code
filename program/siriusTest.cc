@@ -45,6 +45,16 @@ std::string * extract_oFileFormats_substrings(std::string fileFormat);
 bool is_a_new_run(int l, std::vector<std::string> list);
 
 void print_help();
+
+struct UserOption{
+	UserOption(char * opt, bool f ){
+		Option = opt;
+		Flag = f;
+	}
+	char *Option;
+	bool Flag;
+};
+
 //---------------ooooooooooooooo---------------ooooooooooooooo---------------ooooooooooooooo---------------
 /*!
  * The main function
@@ -52,7 +62,7 @@ void print_help();
 int main(int argc, char *argv[])
 {
 
-//	TRint *app = new TRint("Analysis", &argc, argv);
+	//	TRint *app = new TRint("Analysis", &argc, argv);
 
 	//gErrorIgnoreLevel = kFatal; 
 	// gErrorIgnoreLevel = kPrint, kInfo, kWarning, kError, kBreak, kSysError, kFatal;
@@ -119,12 +129,51 @@ int main(int argc, char *argv[])
 			}
 		}
 		configFile.close();
-		// overwrite the commands from Run
 		if (argc > 1){
 			const int Ncommands = 10;
 			bool flag[ Ncommands] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			std::string command[Ncommands] = {"-r", "-s", "-sr", "-ss", "-i", "-o", "-f", "-t", "-n", "-h"};
 			std::string command2[Ncommands] = {"--runnumbers", "--subrunnumbers", "--sumruns", "--sumsubruns", "--inputdirectory", "--outputdirectory", "--treefileformat", "--treename", "--numberofeventstoprocess", "--help"};
+
+//Check if the commands are not correct
+			bool found = false;
+			std::vector<UserOption> options;
+			for(int i = 0; i < argc; i++){
+
+				if(argv[i][0] == '-'){
+					found = false;	
+
+					for(int cc =0; cc< Ncommands; cc++){// cc : current command
+						if((strcmp(argv[i], command[cc].c_str()) == 0) ||
+								(strcmp(argv[i], command2[cc].c_str()) == 0)){
+							found = true;
+							break;
+						}
+					}
+
+					if(!found){
+						UserOption o(argv[i], found);
+						options.push_back(o);
+					}
+				}
+
+			}
+
+			if(options.size() > 0){
+				for(unsigned int i = 0; i< options.size();i++){
+					if(options.at(i).Flag == 0){
+						cout<<"OPTION : "<<options.at(i).Option <<" is not correct. "<<endl;
+					}
+
+				}
+				cout<<"\n         For Help Type:"<<endl;
+				cout<<"                  'ConvertToRootFile -h'"<<endl;
+				cout<<"                            or          "<<endl;
+				cout<<"                  'ConvertToRootFile --help'\n"<<endl;
+                                options.clear();
+				filelist.clear();
+				exit(0);
+			}
 
 			for(int i = 0; i < argc; i++){
 				for(int cc =0; cc< Ncommands; cc++){// cc : current command
@@ -146,6 +195,7 @@ int main(int argc, char *argv[])
 							print_help();
 							filelist.clear();
 							exit(0);
+
 						}						
 						continue;// to skip this entry
 					}
@@ -177,26 +227,26 @@ int main(int argc, char *argv[])
 				}
 			}
 
-// CHeck if a wrong command id given
-
 
 			to_upper(sum_runs);
 			to_upper(sum_subRuns);
 		}
-		/*
-		   std::cout<<"*****************************************************************"<<std::endl;
-		   std::cout<<"Run numbers = "<<run_numbers<<std::endl;
-		   std::cout<<"Sub Run numbers = "<<subrun_numbers<<std::endl;
-		   std::cout<<"Input file path = "<<input_dir<<std::endl;
-		   std::cout<<"Output file path = "<<output_dir<<std::endl;
-		   std::cout<<"TTree file format = "<<treeFileFormat<<std::endl;
-		   std::cout<<"TTree name = "<<treeName<<std::endl;
-		   std::cout<<"Sum Runs = "<<sum_runs<<std::endl;
-		   std::cout<<"Sum subRuns = "<<sum_subRuns<<std::endl;
-		   std::cout<<"Number of events to process = "<<number_of_events_to_process<<std::endl;
-		   std::cout<<"*****************************************************************"<<std::endl;
-		   */
 
+		/*		std::cout<<"*****************************************************************"<<std::endl;
+				std::cout<<"Run numbers = "<<run_numbers<<std::endl;
+				std::cout<<"Sub Run numbers = "<<subrun_numbers<<std::endl;
+				std::cout<<"Input file path = "<<input_dir<<std::endl;
+				std::cout<<"Output file path = "<<output_dir<<std::endl;
+				std::cout<<"Save TTree file = "<<save_ttree<<std::endl;
+				std::cout<<"TTree file format = "<<treeFileFormat<<std::endl;
+				std::cout<<"TTree name = "<<treeName<<std::endl;
+				std::cout<<"Sum Runs = "<<sum_runs<<std::endl;
+				std::cout<<"Sum subRuns = "<<sum_subRuns<<std::endl;
+				std::cout<<"Save histogram file = "<<save_histo<<std::endl;
+				std::cout<<"Histogram file format = "<<histFileFormat<<std::endl;
+				std::cout<<"Number of events to process = "<<number_of_events_to_process<<std::endl;
+				std::cout<<"*****************************************************************"<<std::endl;
+				*/
 		// Check if input parameters are empty or wrong
 		if(run_numbers.empty() || subrun_numbers.empty() || sum_runs.empty() || sum_subRuns.empty() || input_dir.empty() || output_dir.empty() || treeFileFormat.empty() || treeName.empty() || number_of_events_to_process.empty()){
 			cout<< "\n********************* Error in the input !! ********************\n\n";
@@ -213,6 +263,8 @@ int main(int argc, char *argv[])
 			filelist.clear();
 			exit(0);
 		}
+
+
 
 		//remove trailling '/'
 		if(input_dir[input_dir.length()-1]=='/'){
@@ -349,9 +401,9 @@ int main(int argc, char *argv[])
 							//--------------
 							// save old file
 							//--------------				
-							cout<<"TTree file name: "<<treeFileName<<endl;
+							cout<<"TTree file name: "<<prev_treeFileName<<endl;
 							if(save_ttree == "YES")	a->Save_Ttree();
-							cout<<"Histo file name: "<<histFileName<<endl;
+							cout<<"Histo file name: "<<prev_histFileName<<endl;
 							if(save_histo == "YES") a->Save_Spectra();
 							delete a;  
 							a = NULL;
@@ -367,9 +419,9 @@ int main(int argc, char *argv[])
 								//--------------
 								// save old file
 								//--------------				
-								cout<<"TTree file name: "<<treeFileName<<endl;
+								cout<<"TTree file name: "<<prev_treeFileName<<endl;
 								if(save_ttree == "YES")	a->Save_Ttree();
-								cout<<"Histo file name: "<<histFileName<<endl;
+								cout<<"Histo file name: "<<prev_histFileName<<endl;
 								if(save_histo == "YES") a->Save_Spectra();
 								delete a;  
 								a = NULL;
@@ -384,9 +436,9 @@ int main(int argc, char *argv[])
 									//--------------
 									//save old file
 									//---------------
-									cout<<"TTree file name: "<<treeFileName<<endl;
+									cout<<"TTree file name: "<<prev_treeFileName<<endl;
 									if(save_ttree == "YES")	a->Save_Ttree();
-									cout<<"Histo file name: "<<histFileName<<endl;
+									cout<<"Histo file name: "<<prev_histFileName<<endl;
 									if(save_histo == "YES") a->Save_Spectra();
 									delete a;  
 									a = NULL;
@@ -405,9 +457,9 @@ int main(int argc, char *argv[])
 						// save old file
 						//--------------				
 						if(sum_subRuns == "YES"){
-							cout<<"TTree file name: "<<treeFileName<<endl;
+							cout<<"TTree file name: "<<prev_treeFileName<<endl;
 							if(save_ttree == "YES")	a->Save_Ttree();
-							cout<<"Histo file name: "<<histFileName<<endl;
+							cout<<"Histo file name: "<<prev_histFileName<<endl;
 							if(save_histo == "YES") a->Save_Spectra();
 							delete a;  
 							a = NULL;
@@ -428,9 +480,9 @@ int main(int argc, char *argv[])
 		//--------------
 		// save last file
 		//--------------				
-		cout<<"TTree file name: "<<treeFileName<<endl;
+		cout<<"TTree file name: "<<prev_treeFileName<<endl;
 		if(save_ttree == "YES")	a->Save_Ttree();
-		cout<<"Histo file name: "<<histFileName<<endl;
+		cout<<"Histo file name: "<<prev_histFileName<<endl;
 		if(save_histo == "YES") a->Save_Spectra();
 		delete a;   
 		a = NULL;
@@ -903,7 +955,6 @@ void print_help(){
 		"\n     -h, --help"
 		"\n                To display a message of utilization of the program.\n"<<endl;
 }
-
 //----------------------------------------------------------
 // function to get the existing files in the input directory 
 //----------------------------------------------------------
