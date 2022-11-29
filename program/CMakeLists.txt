@@ -91,11 +91,11 @@ endif()
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the ROOT libraries
 #
-add_executable(siriusTest siriusTest.cc ${sources} ${headers})
-target_link_libraries(siriusTest ${User_LIBRARIES} ${ROOT_LIBRARIES} Spectrum)
-target_link_libraries(siriusTest libMFM::libMFM)
+add_executable(SiriusTest siriusTest.cc ${sources} ${headers})
+target_link_libraries(SiriusTest ${User_LIBRARIES} ${ROOT_LIBRARIES} Spectrum)
+target_link_libraries(SiriusTest libMFM::libMFM)
 
-add_custom_target(SIRIUS DEPENDS siriusTest)
+add_custom_target(SIRIUS DEPENDS SiriusTest)
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
