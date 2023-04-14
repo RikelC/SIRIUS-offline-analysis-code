@@ -80,7 +80,7 @@ void digitalFilters::get_moving_average_signal(T* const v, int N, int nStart, in
  *
  */
 template<class T>
-int * digitalFilters::get_start_stop_range(T* const v, double signal_is, int m = 10){
+int * digitalFilters::get_start_stop_range(T* const v, double signal_is, int m){
 
 	T diff =0;  T max_diff2 =0.; 
 	for( int n = 0; n < s1->TRACE_SIZE; n++){
@@ -274,7 +274,7 @@ void digitalFilters::get_RC_constant(dssdData* const data){
 //! Calculate max value of the trapezoidal automatically
 double digitalFilters::get_auto_max_val_trapezoidal(double * const v){
 
-	int *arr = get_start_stop_range(v,5);
+	int *arr = get_start_stop_range(v,5, 10);
 	double height =0.;
 
 	for(int i = arr[0];i<= arr[1];i++){
