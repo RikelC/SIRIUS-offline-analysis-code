@@ -37,8 +37,8 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/includes/*.hh)
 #-----------------------
 # User Library
 #--------------------------
-set(UserLib_Path /home/sirius/Chakma/test_installation/UserLib/build )
-find_library(User_LIBRARIES NAMES UserLIB  HINTS ${UserLib_Path})
+set(UserLib_Path /home/sirius/Chakma/test_installation/SiriusUserLib/lib )
+find_library(User_LIBRARIES NAMES SiriusUserLIB  HINTS ${UserLib_Path})
 
 if (User_LIBRARIES)
         message(STATUS "-- found  ${User_LIBRARIES}")
