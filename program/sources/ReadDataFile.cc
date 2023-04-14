@@ -11,7 +11,7 @@
 
 //---------------ooooooooooooooo---------------ooooooooooooooo---------------ooooooooooooooo---------------
 /*!
- * To the size of the file in bytes
+ * To the size of the file in kilo bytes
  */
 long get_file_size(const char * filename){
 	FILE *fd = fopen(filename, "r");
@@ -151,7 +151,7 @@ void ReadDataFile::Initialize_Spectra(const char* histFileName){
 void ReadDataFile::Initialize_Ttree(const char* treeFileName, const char* treeName){
 	oTreeFile = new TFile(treeFileName, "RECREATE");
 	oTree = new TTree(treeName, treeName);
-	oTree->Branch("Time", &Time, "Time/l");
+	oTree->Branch("Time", &timestamp, "Time/l");
 	oTree->Branch("EventNo",  &eventnumber, "EventNo/i");
 	oTree->Branch("TraceSize",  &trace_size, "trace_size/s");
 	oTree->Branch("Trace",  dData->get_trace(), "Trace[trace_size]/s");
@@ -190,7 +190,7 @@ void ReadDataFile::Save_Ttree(){
 void ReadDataFile::Read(const char * filename, const char * nEvent )
 {
 
-        StartOfRun();
+	StartOfRun();
 	long fileSize = get_file_size(filename);
 	long fileSize_kbytes = fileSize/1024.;
 	std::string filename2 = filename;
@@ -290,10 +290,9 @@ void ReadDataFile::ReadUserFrame(MFMCommonFrame* commonframe) {
 		default: 
 			frameCounter[7]++;
 			if(frameCounter[7] > 1) break;
-                        ReadDefaultFrame(commonframe);
+			ReadDefaultFrame(commonframe);
 			break;
 	}// end of switch
-	
 }
 //---------------ooooooooooooooo---------------ooooooooooooooo---------------ooooooooooooooo---------------
 /*!
@@ -461,13 +460,14 @@ void ReadDataFile::ReadSiriusFrame( MFMCommonFrame* commonframe){
 	hist->hNoise[iboard][channel]->Fill(dData->get_Noise());
 	hist->hRisetime[iboard][channel]->Fill(dData->get_RiseTime());
 	Energy = filter->perform(dData, hist->hTrap[iboard][channel]);
-	//Energy  = dData->get_signalHeight();
+//	Energy  = dData->get_signalHeight();
 	hist->h_raw_strip->Fill(Energy, stripnumber);
 	calibEnergy = calib->perform(dData);//Calibration
 	hist->h_calib_strip->Fill(dData->get_calibrated_energy(),stripnumber);
-	hist->hRaw[iboard][channel]->Fill(dData->get_raw_energy());
+	hist->hRaw[iboard][channel]->Fill(Energy);
 	//get CFD time in (ns)
-	Time = cfd->perform(dData);
+	//Time = cfd->perform(dData);
+	Time = timestamp;
 
 	//Fill baseline graphs
 	hist->gr_baseline[iboard][channel]->SetPoint(dssd_event_counter[iboard][channel],dssd_event_counter[iboard][channel],dData->get_Baseline());
@@ -475,7 +475,7 @@ void ReadDataFile::ReadSiriusFrame( MFMCommonFrame* commonframe){
 
 	if(Time < 1E15){
 		//----this condition ensures that the time stamp is ok
-		dPoint.set_time(Time);
+		dPoint.set_time(timestamp);
 		dPoint.set_strip(stripnumber);
 		dPoint.set_energy(dData->get_calibrated_energy());
 		dssdDataVec.push_back(dPoint);

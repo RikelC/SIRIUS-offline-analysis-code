@@ -42,6 +42,7 @@
 #include <csignal>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
 //---------------ooooooooooooooo---------------ooooooooooooooo---------------ooooooooooooooo---------------
 using namespace std;
 class ReadDataFile

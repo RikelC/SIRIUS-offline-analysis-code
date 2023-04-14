@@ -37,7 +37,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/includes/*.hh)
 #-----------------------
 # User Library
 #--------------------------
-set(UserLib_Path /home/sirius/Chakma/test_installation/UserLib/build )
+set(UserLib_Path /home/sirius/Chakma/Gru_dev/GRU_SIRIUS/GUser-sources/UserLib/build)
 find_library(User_LIBRARIES NAMES UserLIB  HINTS ${UserLib_Path})
 
 if (User_LIBRARIES)
@@ -57,21 +57,20 @@ include_directories(${UserLibIncludes} ${UserLibSources})
 #add MFM library
 #find the library
 #include(GNUInstallDirs)
-set(MFM_DIR /home/sirius/Chakma/test_installation/MFMlib-master/)
+#set(MFM_DIR MFMlib-master/sources/)
 #include_directories(${CMAKE_BINARY_DIR})
-include_directories(${MFM_DIR}/include/)
-#include_directories(${MFM_DIR}/include/GanTape/)
+include_directories(${CMAKE_SOURCE_DIR}/../MFMlib-master/sources/)
+include_directories(${CMAKE_SOURCE_DIR}/../MFMlib-master/sources/GanTape/)
 
-find_library(MFM_LIBRARY NAMES MFM HINTS ${MFM_DIR}/lib )
+find_library(MFM_LIBRARY NAMES MFM HINTS ${PROJECT_BINARY_DIR}/../ PATH_SUFFIXES MFMlib-master/build/ )
 #find the headers
-find_path(MFM_INCLUDE_DIR NAMES MFMAllFrames.h HINTS ${MFM_DIR}/include/)
+find_path(MFM_INCLUDE_DIR NAMES MFMAllFrames.h HINTS ${PROJECT_BINARY_DIR}/../ ${CMAKE_INSTALL_INCLUDEDIR} PATH_SUFFIXES MFMlib-master/sources/)
 
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(libMFM DEFAULT_MSG
                                   MFM_LIBRARY
                                   MFM_INCLUDE_DIR)
-
 #make some checks
 mark_as_advanced(MFM_LIBRARY MFM_INCLUDE_DIR)
 if(LIBMFM_FOUND AND NOT TARGET libMFM::libMFM)#1st arg is set if find_package_handle_standard_args() succeeds and 2nd part NOT TARGET ensures that the library is not already declared as a target withing the current project
@@ -92,16 +91,16 @@ endif()
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the ROOT libraries
 #
-add_executable(SiriusTest siriusTest.cc ${sources} ${headers})
-target_link_libraries(SiriusTest ${User_LIBRARIES} ${ROOT_LIBRARIES} Spectrum)
-target_link_libraries(SiriusTest libMFM::libMFM)
+add_executable(siriusTest siriusTest.cc ${sources} ${headers})
+target_link_libraries(siriusTest ${User_LIBRARIES} ${ROOT_LIBRARIES} Spectrum)
+target_link_libraries(siriusTest libMFM::libMFM)
 
-add_custom_target(SIRIUS DEPENDS SiriusTest)
+add_custom_target(SIRIUS DEPENDS siriusTest)
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
-install(TARGETS SiriusTest DESTINATION bin)
+install(TARGETS siriusTest DESTINATION bin)
 
 
 

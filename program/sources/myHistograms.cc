@@ -220,7 +220,7 @@ void myHistograms::rawHistInitialization(TFile* f){
 			if(!tempDir) tempDir = dBoard2[iboard]->mkdir(sfname.Data());
 			tempDir->cd();
 			name.Form("RawData_%d_%d",s1->boardList_Tunnel[iboard], channel);
-			h_tunnelRaw[iboard][channel] = new TH1I (name.Data(),name.Data(),8000,0,8000);
+			h_tunnelRaw[iboard][channel] = new TH1I (name.Data(),name.Data(),8000,0,20000);
 			//Calib data
 			sfname = "CalibHist";		
 			tempDir = (TDirectory*) dBoard2[iboard]->GetDirectory(sfname);
@@ -238,7 +238,7 @@ void myHistograms::rawHistInitialization(TFile* f){
 	if(!tempDir) tempDir = dFile->mkdir(fname.Data());
 	tempDir->cd();
 	//-raw energy vs strip number
-	h_raw_pad = new TH2F("h_raw_pad",";E (ADC ch);pad number", 2000,0,10000,96,0,96);
+	h_raw_pad = new TH2F("h_raw_pad",";E (ADC ch);pad number", 8000,0,20000,96,0,96);
 	//-calibrated energy vs strip number
 	h_calib_pad = new TH2F("h_calib_pad",";E (keV);pad number", 2000,0,10000,96,0,96);
 	//-hit pattern in the TUNNEL
