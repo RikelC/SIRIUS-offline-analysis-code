@@ -1,10 +1,18 @@
 #----------------------------------------------------------------------------
 # Setup the project
+#----------------------------------------------------------------------------
+
+
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+
 project(SIRIUS)
+
+
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+
+
 if(COMPILER_SUPPORTS_CXX11)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 elseif(COMPILER_SUPPORTS_CXX0X)
@@ -15,29 +23,56 @@ endif()
 
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON) 
+
+
 #----------------------------------------------------------------------------
-# find root package
-# Setup include directory for this project
-#find_package(ROOT REQUIRED)
-#
-#SET( ROOT_USE_COMPONENTS MathMore Gdml Geo)
-# or
+# Tinyxml
+#----------------------------------------------------------------------------
+
+if(NO_MFMNXML)
+message(STATUS "compilation without tinyxml")
+
+add_definitions( -DNO_MFMXML )
+else()
+find_library(TinyXML_LIBRARIES tinyxml HINTS ${MYTINYXMLDIR} )
+	if(TinyXML_LIBRARIES)
+   	message(STATUS "-- found local ${TinyXML_LIBRARIES}")
+	else()
+	find_library(TinyXML_LIBRARIES tinyxml  )
+		if (TinyXML_LIBRARIES)
+		message(STATUS "-- found  ${TinyXML_LIBRARIES}")
+		else()
+   		message(WARNING "-- TinyXML_LIBRARIES not found")
+   		endif()
+	endif()
+endif()
+
+
+#----------------------------------------------------------------------------
+#                                      ROOT
+#----------------------------------------------------------------------------
+
 find_package(ROOT REQUIRED COMPONENTS  MathMore MathCore)
 
 include_directories(${ROOT_INCLUDE_DIRS})
 
-include_directories(${PROJECT_SOURCE_DIR}/includes)
+
 #----------------------------------------------------------------------------
-# Locate sources and headers for this project
-# NB: headers are included so they will show up in IDEs
-#
+#         Locate sources and headers for this project
+#----------------------------------------------------------------------------
+include_directories(${PROJECT_SOURCE_DIR}/includes)
+#include_directories(${CMAKE_BINARY_DIR})
 file(GLOB sources ${PROJECT_SOURCE_DIR}/sources/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/includes/*.hh)
 
-#-----------------------
-# User Library
-#--------------------------
-set(UserLib_Path /home/sirius/Chakma/test_installation/SiriusUserLib/lib )
+#----------------------------------------------------------------------------
+#                      User Library
+#----------------------------------------------------------------------------
+
+set(UserLib_Path /Users/chakma/Desktop/SiriusTest/SIRIUS-offline-analysis-code-main/SiriusUserLib/lib )
+
 find_library(User_LIBRARIES NAMES SiriusUserLIB  HINTS ${UserLib_Path})
 
 if (User_LIBRARIES)
@@ -53,17 +88,18 @@ include_directories(${UserLibIncludes} ${UserLibSources})
 
 #add_subdirectory(UserLib)
 
+#----------------------------------------------------------------------------
+#                          MFM library
+#----------------------------------------------------------------------------
 
-#add MFM library
-#find the library
-#include(GNUInstallDirs)
-set(MFM_DIR /home/sirius/Chakma/test_installation/MFMlib-master/)
-#include_directories(${CMAKE_BINARY_DIR})
+set(MFM_DIR /Users/chakma/Desktop/SiriusTest/MFMlib-master)
 include_directories(${MFM_DIR}/include/)
-#include_directories(${MFM_DIR}/include/GanTape/)
+include_directories(${MFM_DIR}/include/GanTape/)
 
 find_library(MFM_LIBRARY NAMES MFM HINTS ${MFM_DIR}/lib )
+
 #find the headers
+
 find_path(MFM_INCLUDE_DIR NAMES MFMAllFrames.h HINTS ${MFM_DIR}/include/)
 
 include(FindPackageHandleStandardArgs)
@@ -71,8 +107,8 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(libMFM DEFAULT_MSG
                                   MFM_LIBRARY
                                   MFM_INCLUDE_DIR)
-
 #make some checks
+
 mark_as_advanced(MFM_LIBRARY MFM_INCLUDE_DIR)
 if(LIBMFM_FOUND AND NOT TARGET libMFM::libMFM)#1st arg is set if find_package_handle_standard_args() succeeds and 2nd part NOT TARGET ensures that the library is not already declared as a target withing the current project
   add_library(libMFM::libMFM SHARED IMPORTED)#SHARED= dynamically linked library and IMPORTED= library is not built by the current project
@@ -82,25 +118,21 @@ set_target_properties(
       INTERFACE_INCLUDE_DIRECTORIES "${MFM_INCLUDE_DIR}"
       IMPORTED_LOCATION ${MFM_LIBRARY})
 endif()
-#list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
-#find_package(libMFM REQUIRED)
-#--------------
-#or
-#add_library(MFM_LIBRARIES STATIC IMPORTED)
-#set_target_properties(MFM_LIBRARIES PROPERTIES IMPORTED_LOCATION /home/sirius/Chakma/sirius_offline_data_analysis_program/MFMlib-master/build/libMFM.a)
-#set_target_properties(MFM_LIBRARIES PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/sirius/Chakma/sirius_offline_data_analysis_program/MFMlib-master/sources/)
+
 #----------------------------------------------------------------------------
-# Add the executable, and link it to the ROOT libraries
-#
+# Add the executable, and link it to the ROOT, User, MFM and Tinyxml libraries
+#----------------------------------------------------------------------------
+
 add_executable(SiriusTest siriusTest.cc ${sources} ${headers})
-target_link_libraries(SiriusTest ${User_LIBRARIES} ${ROOT_LIBRARIES} Spectrum)
+target_link_libraries(SiriusTest ${User_LIBRARIES} ${ROOT_LIBRARIES} ${TinyXML_LIBRARIES})
 target_link_libraries(SiriusTest libMFM::libMFM)
 
 add_custom_target(SIRIUS DEPENDS SiriusTest)
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
-#
+#----------------------------------------------------------------------------
+
 install(TARGETS SiriusTest DESTINATION bin)
 
 
