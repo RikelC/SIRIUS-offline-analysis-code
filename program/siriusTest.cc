@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
 				else{
 					if(current_runN == prev_runN){// have the same run number
 						//first check if they are different runs with same run number
-						if(current_subrunN = prev_subrunN){
+						if(current_subrunN == prev_subrunN){
 							//--------------
 							// save old file
 							//--------------				
@@ -871,7 +871,7 @@ std::vector<std::string> get_existing_files(std::string dir, std::vector<std::st
 		for (size_t i = 0;i < files.size();i++){
 
 			int runNo= 0;
-			if(sscanf(files[i].c_str(), "run_%04d.dat.%*", &runNo))
+			if(sscanf(files[i].c_str(), "run_%04d.dat.%*s", &runNo))
 			{
 				if(runNo == atoi(list[j].c_str())){
 					runfiles.push_back(files[i]);
@@ -913,7 +913,7 @@ std::vector<std::string> get_existing_files(std::string dir, std::vector<int> li
 		for (size_t i = 0;i < files.size();i++){
 
 			int runNo= 0;
-			if(sscanf(files[i].c_str(), "run_%04d.dat.%*", &runNo))
+			if(sscanf(files[i].c_str(), "run_%04d.dat.%*s", &runNo))
 			{
 				if(runNo == list[j]){
 					runfiles.push_back(files[i]);
