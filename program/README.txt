@@ -8,7 +8,7 @@ Build and Installation of MFMlibrary
      If tinyxml is installed
 5. cmake -DCMAKE_INSTALL_PREFIX=../ ../sources/; make; make install
      else
-5. cmake -DNO_MFMNXML=YES -DCMAKE_INSTALL_PREFIX=../ ../sources/
+5. cmake -DNO_MFMNXML=YES -DCMAKE_INSTALL_PREFIX=../ ../sources/; make; make install
 
 -----------------------
 Build of SiriusUserLibrary
